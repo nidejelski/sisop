@@ -38,15 +38,16 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	t->prio = prio;
 	t->context = contextoNovo;
   
-  // Conferência de maximo de threads (100)
-  if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){   //algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
-          //insere na fila de APTOS
-          //insereAptos(escalonador, t);
-          return t->tid;
-	}else{
+        // Conferência de maximo de threads (100)
+        if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){   //algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
+                  //insere na fila de APTOS
+                  //insereAptos(escalonador, t);
+                  return t->tid;
+	}
+	else{
 		  printf("Excedido o numero maximo de threads - THREAD: %d não foi criada\n",t->tid); 	
 		  free(contextoNovo);
 		  free(t);	
-		 return 0;						 
+		  return 0;						 
 	}
 }
