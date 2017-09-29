@@ -46,6 +46,7 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
                   return t->tid;
 	}
 	else{
+		  //erro
 		  printf("Excedido o numero maximo de threads - THREAD: %d não foi criada\n",t->tid); 	
 		  free(contextoNovo);
 		  free(t);	
