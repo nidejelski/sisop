@@ -39,7 +39,8 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	t->context = contextoNovo;
   
         // Conferência de maximo de threads (100)
-        if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){   //algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
+	//algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
+        if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){
                   //insere na fila de APTOS
                   //insereAptos(escalonador, t);
                   return t->tid;
