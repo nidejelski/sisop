@@ -27,26 +27,26 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	contextoNovo->uc_stack.ss_sp = (char*)malloc(TAMANHO_PILHA);
 	contextoNovo->uc_stack.ss_size = TAMANHO_PILHA;
 		
-	// No fim da função tem que retornar pro escalonador	
+	//No fim da função tem que retornar pro escalonador	
 	contextoNovo->uc_link = [CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador 
 	getcontext(contextoNovo);
 	makecontext(contextoNovo,(void(*)(void))start,1,arg); 
 	
-	// seta parametros da TCB
+	//Seta parametros da TCB
 	t->tid = id++;
 	t->state = PROCST_CRIACAO;
 	t->prio = prio;
 	t->context = contextoNovo;
   
-        // Conferência de maximo de threads (100)
-	//algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
+        //Conferência de maximo de threads (100)
+	//Algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
         if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){
-                  //insere na fila de APTOS
+                  //Insere na fila de APTOS
                   //insereAptos(escalonador, t);
                   return t->tid;
 	}
 	else{
-		  //erro
+		  //Erro
 		  printf("Excedido o numero maximo de threads - THREAD: %d não foi criada\n",t->tid); 	
 		  free(contextoNovo);
 		  free(t);	
