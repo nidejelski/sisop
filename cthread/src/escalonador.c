@@ -7,10 +7,10 @@ Escalonador* escalonador;
 
 Escalonador* escalonadorInit(){
 	//instancia escalonador
-  Escalonador* escalonator = (Escalonador*) malloc(sizeof(Escalonador));
+        Escalonador* escalonator = (Escalonador*) malloc(sizeof(Escalonador));
 	
-  //cria as filas
-  escalonator->filaAptos = CreateFila2(); //uso da biblioteca de filas
+        //cria as filas
+        escalonator->filaAptos = CreateFila2(); //uso da biblioteca de filas
 	escalonator->filaBloqs = CreateFila2();	
 	escalonator->threadEmExec = NULL;
 
