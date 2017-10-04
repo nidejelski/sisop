@@ -26,7 +26,7 @@ int insereAptos(Escalonador* escalonator, s_TCB *thread){
 	return 1;
 }
 
-Thread* retiraAptos(Escalonador* escalonator){
+s_TCB* retiraAptos(Escalonador* escalonator){
 }
 
 int insereBloqs(Escalonador* escalonator, s_TCB *thread){
@@ -34,7 +34,7 @@ int insereBloqs(Escalonador* escalonator, s_TCB *thread){
 	return 1;
 }
 
-Thread* retiraBloqs(Escalonador* escalonator){
+s_TCB* retiraBloqs(Escalonador* escalonator){
 }
 
 void liberaEscalonador(int id){
