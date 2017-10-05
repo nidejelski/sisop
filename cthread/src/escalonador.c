@@ -2,6 +2,7 @@
 #include <ucontext.h>
 #include "escalonador.h"
 #include "support.h"
+#include "cdata.h"
 
 Escalonador* escalonador;
 
