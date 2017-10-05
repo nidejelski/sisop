@@ -55,7 +55,12 @@ void escalonadorExec(){
 }
 
 void trocaContexto(){
-	if(!isEmpty(escalonador->filaAptos)){
+	//#define	NXTFILA_VAZIA		1
+        //#define	NXTFILA_ITERINVAL	2
+        //#define	NXTFILA_ENDQUEUE	3
+        //int NextFila2(PFILA2 pFila);
+	
+	if(NextFila2(escalonador->filaAptos) != 1 ){
 		escalonador->threadEmExec = retiraAptos(escalonador);
 		setcontext(escalonador->threadEmExec->contexto); // executa thread
 	}
