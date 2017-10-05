@@ -1,68 +1,71 @@
 #include <stdlib.h>
 #include <ucontext.h>
-#include "escalonador.h"
 #include "support.h"
 #include "cdata.h"
 
-Escalonador* escalonador;
+Escalonador* escalonator;
 
 Escalonador* escalonadorInit(){
 	//instancia escalonador
-        Escalonador* escalonator = (Escalonador*) malloc(sizeof(Escalonador));
-	
-        //cria as filas
-        escalonator->filaAptos = CreateFila2(); //uso da biblioteca de filas
-	escalonator->filaBloqs = CreateFila2();	
-	escalonator->threadEmExec = NULL;
+    escalonator = (Escalonador*) malloc(sizeof(Escalonador));
+
+    //cria as filas
+    PFILA2 filaAP = malloc(sizeof(PFILA2));
+    PFILA2 filaBL = malloc(sizeof(PFILA2));
+
+    if (CreateFila2(filaAP) == 0) escalonator->filaAptos = NULL;
+	if (CreateFila2(filaBL) == 0) escalonator->filaBloqs = NULL;
+	//escalonator->threadEmExec = NULL;
 
 	//inicia contexto
 	ucontext_t* contextoEscalonator = (ucontext_t*) malloc(sizeof(ucontext_t));
-	escalonator->contextoEscalonador = contextoEscalonator;	
-	
+	escalonator->contexto_escalonador = contextoEscalonator;
+
+    printf ("Iniciou escalonador! \n");
+
 	return escalonator;
 }
 
-int insereAptos(Escalonador* escalonator, s_TCB *thread){
-	AppendFila2(escalonator->filaAptos, thread); 
+int insereAptos(Escalonador* escalonator, TCB_t *thread){
+	//AppendFila2(escalonator->filaAptos, thread);
 	return 1;
 }
 
-s_TCB* retiraAptos(Escalonador* escalonator){
+TCB_t* retiraAptos(Escalonador* escalonator){
+    printf ("retirei de APTOS \n");
 }
 
-int insereBloqs(Escalonador* escalonator, s_TCB *thread){
-	appendFila2(escalonator->filaBloqs, thread); 
+int insereBloqs(Escalonador* escalonator, TCB_t *thread){
+	//appendFila2(escalonator->filaBloqs, thread);
 	return 1;
 }
 
-s_TCB* retiraBloqs(Escalonador* escalonator){
+TCB_t* retiraBloqs(Escalonador* escalonator){
+    printf ("retirei de BLOQ \n");
 }
 
 void liberaEscalonador(int id){
 	//free()
+	printf ("liberei escalonador \n");
 }
 
 void escalonadorExec(){
-	/*Define contexto do escalonador. Se thread acabar, vem para esse contexto*/	
-	getcontext(escalonador->contextoEscalonador); 
-	
-	if(escalonador->threadEmExec->estado != MAIN){	
-		liberaEscalonador(escalonador->threadEmExec->tid);
-		free(escalonador->threadEmExec);
+	/*Define contexto do escalonador. Se thread acabar, vem para esse contexto*/
+	getcontext(escalonator->contexto_escalonador);
+
+	if(escalonator->threadEmExec->tid != 0){ // 0 == MAIN
+		liberaEscalonador(escalonator->threadEmExec->tid);
+		free(escalonator->threadEmExec);
 	}
 	trocaContexto();
-	
+
 }
 
 void trocaContexto(){
-	//#define	NXTFILA_VAZIA		1
-        //#define	NXTFILA_ITERINVAL	2
-        //#define	NXTFILA_ENDQUEUE	3
-        //int NextFila2(PFILA2 pFila);
-	
-	if(NextFila2(escalonador->filaAptos) != 1 ){
-		escalonador->threadEmExec = retiraAptos(escalonador);
-		setcontext(escalonador->threadEmExec->contexto); // executa thread
+	if(NextFila2(escalonator->filaAptos) != -1) {  //se fila não for vazia
+		printf ("TROCA CONTEXTO");
+		//escalonator->threadEmExec = retiraAptos(escalonator);
+		//setcontext(escalonator->threadEmExec->contexto); // executa thread
 	}
 }
 
