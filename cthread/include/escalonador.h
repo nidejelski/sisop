@@ -3,8 +3,8 @@
 #include "ucontext.h"
 
 struct Escalonador{
-    sFila2* filaAptos;
-    SFila2* filaBloqs;
+    PFILA2 filaAptos;
+    PFILA2 filaBloqs;
     s_TCB* threadEmExec; // thread que esta rodando
     ucontext_t* contexto_escalonador;	// contexto escalonador
 };
