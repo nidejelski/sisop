@@ -57,13 +57,13 @@ int main(int argc, char *argv[])
     int t1 = ccreate((void*)f1,escalona,0);
 
     if (t1 == 0) printf ("\n Nao conseguiu criar thread 1");
-    else printf ("\n Thread 1 criada!");
+    else printf ("\n Thread %d criada!", t1);
 
     //cria Thread2
     int t2 = ccreate((void*)f2,escalona,0);
 
     if (t2 == 0) printf ("\n Nao conseguiu criar thread 1");
-    else printf ("\n Thread 2 criada!");
+    else printf ("\n Thread %d criada!", t2);
 
     //FirstFila2(escalona->filaAptos);
     //if (NextFila2(escalona->filaAptos) == -3 ) printf ("\n FIM DA FILA! \n");
