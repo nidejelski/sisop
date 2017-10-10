@@ -45,6 +45,12 @@ TCB_t* retiraAptos(Escalonador* escalonator){
     printf ("retirei de APTOS \n");
 }
 
+/*-------------------------------------------------------------------
+Função:	Insere thread na fila de bloqueados do escalonador
+Ret:	==0, se conseguiu
+	!=0, caso contrário
+-------------------------------------------------------------------*/
+
 int insereBloqs(Escalonador* escalonator, TCB_t *thread){
     if(AppendFila2(escalonator->filaBloqs, thread) == 0) {
        printf("Inseriu na fila de Bloqs\n");
