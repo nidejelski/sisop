@@ -62,7 +62,7 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
     }
 
 
-	//return t->tid;
+     return t->tid;
 
         //Conferência de maximo de threads (100)
 	//Algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
