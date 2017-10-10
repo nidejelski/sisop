@@ -13,12 +13,12 @@ Escalonador* escalonadorInit(){
     PFILA2 filaAP = malloc(sizeof(PFILA2));
     PFILA2 filaBL = malloc(sizeof(PFILA2));
 
-    if (CreateFila2(filaAP) == 0) escalonator->filaAptos = NULL;
-	if (CreateFila2(filaBL) == 0) escalonator->filaBloqs = NULL;
+    if (CreateFila2(filaAP) == 0) escalonator->filaAptos = filaAP;
+	if (CreateFila2(filaBL) == 0) escalonator->filaBloqs = filaBL;
 	//escalonator->threadEmExec = NULL;
 
 	//inicia contexto
-	ucontext_t* contextoEscalonator = (ucontext_t*) malloc(sizeof(ucontext_t));
+	ucontext_t* contextoEscalonator = malloc(sizeof(ucontext_t));
 	escalonator->contexto_escalonador = contextoEscalonator;
 
     printf ("Iniciou escalonador! \n");
@@ -26,9 +26,19 @@ Escalonador* escalonadorInit(){
 	return escalonator;
 }
 
-int insereAptos(Escalonador* escalonator, TCB_t *thread){
-	//AppendFila2(escalonator->filaAptos, thread);
-	return 1;
+/*-------------------------------------------------------------------
+Função:	Insere thread na fila de aptos do escalonador
+Ret:	==0, se conseguiu
+	!=0, caso contrário
+-------------------------------------------------------------------*/
+int insereAptos(Escalonador* escalonator, TCB_t* thread){
+    if(AppendFila2(escalonator->filaAptos, thread) == 0) {
+       printf("Inseriu na fila de Aptos\n");
+       return 0;
+    }
+    else printf("Oops!");
+    return 1;
+
 }
 
 TCB_t* retiraAptos(Escalonador* escalonator){
@@ -36,8 +46,12 @@ TCB_t* retiraAptos(Escalonador* escalonator){
 }
 
 int insereBloqs(Escalonador* escalonator, TCB_t *thread){
-	//appendFila2(escalonator->filaBloqs, thread);
-	return 1;
+    if(AppendFila2(escalonator->filaBloqs, thread) == 0) {
+       printf("Inseriu na fila de Bloqs\n");
+       return 0;
+    }
+    else printf("Oops!");
+    return 1;
 }
 
 TCB_t* retiraBloqs(Escalonador* escalonator){
