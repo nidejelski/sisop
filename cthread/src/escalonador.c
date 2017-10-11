@@ -29,7 +29,7 @@ Escalonador* escalonadorInit(){
 /*-------------------------------------------------------------------
 Função:	Insere thread na fila de aptos do escalonador
 Ret:	==0, se conseguiu
-	!=0, caso contrário
+	    1, caso contrário
 -------------------------------------------------------------------*/
 int insereAptos(Escalonador* escalonator, TCB_t* thread){
     if(AppendFila2(escalonator->filaAptos, thread) == 0) {
@@ -41,9 +41,30 @@ int insereAptos(Escalonador* escalonator, TCB_t* thread){
 
 }
 
-TCB_t* retiraAptos(Escalonador* escalonator){
-    printf ("retirei de APTOS \n");
+/*-------------------------------------------------------------------
+Função:	Remove thread na fila de aptos do escalonador
+Ret:	==0, se conseguiu
+	    >0, caso contrário
+-------------------------------------------------------------------*/
+
+int removeAptos(Escalonador* escalonator){
+    int fAux = FirstFila2(escalonator->filaAptos);
+    if (fAux == 0){
+        if(DeleteAtIteratorFila2(escalonator->filaAptos) == 0){
+            printf ("\n retirei de APTOS \n");
+            return 0;
+        }
+        else {
+            printf ("fila vazia ou itinval\n");
+            return 1;
+        }
+    }
+    else{
+        printf("fila vazia ou erro | erro : %d", fAux);
+        return 2;
+    }
 }
+
 
 /*-------------------------------------------------------------------
 Função:	Insere thread na fila de bloqueados do escalonador
@@ -60,8 +81,28 @@ int insereBloqs(Escalonador* escalonator, TCB_t *thread){
     return 1;
 }
 
-TCB_t* retiraBloqs(Escalonador* escalonator){
-    printf ("retirei de BLOQ \n");
+/*-------------------------------------------------------------------
+Função:	Remove thread na fila de bloqueados do escalonador
+Ret:	==0, se conseguiu
+	    >0, caso contrário
+-------------------------------------------------------------------*/
+
+int removeBloqs(Escalonador* escalonator){
+    int fAux = FirstFila2(escalonator->filaBloqs);
+    if (fAux == 0){
+        if(DeleteAtIteratorFila2(escalonator->filaBloqs) == 0){
+            printf ("\n retirei de BLOQS \n");
+            return 0;
+        }
+        else {
+            printf ("fila vazia ou itinval\n");
+            return 1;
+        }
+    }
+    else{
+        printf("fila vazia ou erro | erro : %d", fAux);
+        return 2;
+    }
 }
 
 void liberaEscalonador(int id){
