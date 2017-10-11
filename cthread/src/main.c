@@ -65,6 +65,14 @@ int main(int argc, char *argv[])
     if (t2 == 0) printf ("\n Nao conseguiu criar thread 1");
     else printf ("\n Thread %d criada!", t2);
 
+    //teste Remove APTOS
+    if (removeAptos(escalona) == 0) printf ("\n SUCESSO REMOVE APTOS \n");
+
+    //teste Remove BLOQS
+    if (removeBloqs(escalona) == 0) printf ("\n SUCESSO REMOVE BLOQS \n");
+
+
+    if (NextFila2(escalona->filaAptos) == -1) printf ("\n Lista de Aptos Vazia! \n");
     //FirstFila2(escalona->filaAptos);
     //if (NextFila2(escalona->filaAptos) == -3 ) printf ("\n FIM DA FILA! \n");
 
