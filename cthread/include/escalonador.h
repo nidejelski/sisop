@@ -16,11 +16,11 @@ Escalonador* escalonadorInit();
 
 int insereAptos(Escalonador* escalonator, TCB_t *thread);
 
-TCB_t* retiraAptos(Escalonador* escalonator);
+int removeAptos(Escalonador* escalonator);
 
 int insereBloqs(Escalonador* escalonator, TCB_t *thread);
 
-TCB_t* retiraBloqs(Escalonador* escalonator);
+int removeBloqs(Escalonador* escalonator);
 
 void escalonadorExec();
 
