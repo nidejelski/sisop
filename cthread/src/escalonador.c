@@ -15,7 +15,7 @@ Escalonador* escalonadorInit(){
 
     if (CreateFila2(filaAP) == 0) escalonator->filaAptos = filaAP;
 	if (CreateFila2(filaBL) == 0) escalonator->filaBloqs = filaBL;
-	//escalonator->threadEmExec = NULL;
+	escalonator->threadEmExec = NULL;
 
 	//inicia contexto
 	ucontext_t* contextoEscalonator = malloc(sizeof(ucontext_t));
@@ -114,19 +114,29 @@ void escalonadorExec(){
 	/*Define contexto do escalonador. Se thread acabar, vem para esse contexto*/
 	getcontext(escalonator->contexto_escalonador);
 
-	if(escalonator->threadEmExec->tid != 0){ // 0 == MAIN
-		liberaEscalonador(escalonator->threadEmExec->tid);
-		free(escalonator->threadEmExec);
+	//if(escalonator->threadEmExec->tid != 0){ // 0 == MAIN
+	//	liberaEscalonador(escalonator->threadEmExec->tid);
+	//	free(escalonator->threadEmExec);
+	//}
+	//trocaContexto();
+    //if(NextFila2(escalonator->filaAptos) == 0)   //se fila não for vazia
+
+	if (FirstFila2(escalonator->filaAptos) == 0){
+		printf ("\n!!!!!TROCA CONTEXTO!!!!\n");
+		escalonator->threadEmExec = GetAtIteratorFila2(escalonator->filaAptos);
+	    if (removeAptos(escalonator) == 0) printf ("   SUCESSO REMOVE APTOS E COLOCA EM EXEC \n");
+
+        //NECESSARIO SETAR CONTEXTO!!!! -> DUVIDAS COM O PROFESSOR EM 16/10/2017 --> RESOLVIDO!
+        setcontext(&escalonator->threadEmExec->context);
 	}
-	trocaContexto();
 
 }
 
 void trocaContexto(){
-	if(NextFila2(escalonator->filaAptos) != -1) {  //se fila não for vazia
-		printf ("TROCA CONTEXTO");
+	//if(NextFila2(escalonator->filaAptos) != -1) {  //se fila não for vazia
+    //printf ("TROCA CONTEXTO");
 		//escalonator->threadEmExec = retiraAptos(escalonator);
 		//setcontext(escalonator->threadEmExec->contexto); // executa thread
-	}
+	//}
 }
 
