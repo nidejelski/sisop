@@ -23,18 +23,16 @@ Caso contrário, retorna um valor negativo.
 
 int ccreate(void* (*start)(void*), void *arg, int prio){
 
-    ucontext_t G, *cp = &G;
-
-	ucontext_t *contextoNovo = malloc(sizeof(ucontext_t));
+    ucontext_t contextoNovo;
 
 	TCB_t* t = (TCB_t*) malloc(sizeof(TCB_t));
-	contextoNovo->uc_stack.ss_sp = (char*)malloc(TAMANHO_PILHA);
-	contextoNovo->uc_stack.ss_size = TAMANHO_PILHA;
+	contextoNovo.uc_stack.ss_sp = (char*)malloc(TAMANHO_PILHA);
+	contextoNovo.uc_stack.ss_size = TAMANHO_PILHA;
 
 	//No fim da função tem que retornar pro escalonador
-	contextoNovo->uc_link = NULL;//[CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador
-	getcontext(contextoNovo);
-	makecontext(contextoNovo,(void(*)(void))start,1,arg);
+	contextoNovo.uc_link = NULL;//[CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador
+	getcontext(&contextoNovo);
+	makecontext(&contextoNovo,(void(*)(void))start,1,arg);
 
 	//Seta parametros da TCB
 	threadID++;
@@ -42,27 +40,25 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	t->state = PROCST_CRIACAO;
 	t->prio = prio;
 
-    cp = contextoNovo;
 	//G = contextoNovo;
-	t->context = G;
+	t->context = contextoNovo;
 
     printf ("\nTID: %d \n", t->tid);
 
 
     //teste Insere APTOS
     if (threadID == 1){
-        if (insereAptos(arg, t) == 0) printf ("\nSUCESSO APTOS\n");
+        if (insereAptos(arg, t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
         else printf("\nFALHA APTOS\n");
     }
 
     //teste Insere BLOQS
     else if (threadID == 2){
-        if (insereBloqs(arg, t) == 0) printf ("\nSUCESSO BLOQS\n");
+        if (insereBloqs(arg, t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
         else printf("\nFALHA BLOQS\n");
     }
 
-
-     return t->tid;
+	return t->tid;
 
         //Conferência de maximo de threads (100)
 	//Algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
