@@ -1,4 +1,5 @@
 # criar pasta /lib neste diretório para funcionar este makefile
+# gcc src/main.c src/hello.c -o main -I"../include"  
 
 
 CC=gcc
@@ -10,18 +11,15 @@ CFLAGS=-c
 
 all: libcthread
 
-libcthread: insert.o escalonador.o cthread.o
+libcthread: escalonador.o cthread.o
 	mv *.o $(BIN_DIR)
-	ar rcs $(LIB_DIR)/libmthread.a $(BIN_DIR)/insert.o $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o
-
-insert.o:
-	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/insert.c 
+	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o
 
 escalonador.o:
-	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/escalonador.c 
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/escalonador.c $(BIN_DIR)/support.o
 
 cthread.o:
-	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/cthread.c 
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/cthread.c $(BIN_DIR)/support.o
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~

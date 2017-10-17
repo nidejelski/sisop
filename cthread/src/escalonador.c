@@ -7,7 +7,9 @@
 
 Escalonador* escalonator;
 
-Escalonador* escalonadorInit(){
+int escalonador_iniciado = 0;
+
+void escalonadorInit(){
 	//instancia escalonador
     escalonator = (Escalonador*) malloc(sizeof(Escalonador));
 
@@ -25,7 +27,11 @@ Escalonador* escalonadorInit(){
 
     printf ("Iniciou escalonador! \n");
 
-	return escalonator;
+    escalonador_iniciado = 1;
+}
+
+int getIniciado(){
+    return escalonador_iniciado;
 }
 
 /*-------------------------------------------------------------------
@@ -33,7 +39,7 @@ Função:	Insere thread na fila de aptos do escalonador
 Ret:	==0, se conseguiu
 	    1, caso contrário
 -------------------------------------------------------------------*/
-int insereAptos(Escalonador* escalonator, TCB_t* thread){
+int insereAptos(TCB_t* thread){
     if(AppendFila2(escalonator->filaAptos, thread) == 0) {
        printf("Inseriu na fila de Aptos\n");
        return 0;
@@ -49,7 +55,7 @@ Ret:	==0, se conseguiu
 	    >0, caso contrário
 -------------------------------------------------------------------*/
 
-int removeAptos(Escalonador* escalonator){
+int removeAptos(){
     int fAux = FirstFila2(escalonator->filaAptos);
     if (fAux == 0){
         if(DeleteAtIteratorFila2(escalonator->filaAptos) == 0){
@@ -74,7 +80,7 @@ Ret:	==0, se conseguiu
 	!=0, caso contrário
 -------------------------------------------------------------------*/
 
-int insereBloqs(Escalonador* escalonator, TCB_t *thread){
+int insereBloqs(TCB_t *thread){
     if(AppendFila2(escalonator->filaBloqs, thread) == 0) {
        printf("Inseriu na fila de Bloqs\n");
        return 0;
@@ -89,7 +95,7 @@ Ret:	==0, se conseguiu
 	    >0, caso contrário
 -------------------------------------------------------------------*/
 
-int removeBloqs(Escalonador* escalonator){
+int removeBloqs(){
     int fAux = FirstFila2(escalonator->filaBloqs);
     if (fAux == 0){
         if(DeleteAtIteratorFila2(escalonator->filaBloqs) == 0){
@@ -133,12 +139,45 @@ void escalonadorExec(){
 	}
 
 }
-
+/*
 void trocaContexto(){
 	//if(NextFila2(escalonator->filaAptos) != -1) {  //se fila não for vazia
     //printf ("TROCA CONTEXTO");
 		//escalonator->threadEmExec = retiraAptos(escalonator);
 		//setcontext(escalonator->threadEmExec->contexto); // executa thread
 	//}
+*/
+
+TCB_t* getThreadEmExer()
+{
+    if(escalonador_iniciado)
+        return escalonator->threadEmExec;
+    else
+        return NULL;
 }
+
+Escalonador* getEscalonador()
+{
+    if(escalonador_iniciado)
+        return escalonator;
+    else
+        return NULL;
+}
+
+PFILA2 getFilaAptos()
+{
+    if(escalonador_iniciado)
+        return escalonator->filaAptos;
+    else
+        return NULL;
+}
+
+PFILA2 getFilaBloqs()
+{
+    if(escalonador_iniciado)
+        return escalonator->filaBloqs;
+    else
+        return NULL;
+}
+
 

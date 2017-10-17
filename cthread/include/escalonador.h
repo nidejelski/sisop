@@ -1,6 +1,7 @@
 #ifndef __escalonador__
 #define __escalonador__
 
+
 #include "support.h"
 #include "cdata.h"
 #include "ucontext.h"
@@ -12,21 +13,30 @@ typedef struct sEscalonador{
     ucontext_t* contexto_escalonador;	// contexto escalonador
 } Escalonador;
 
-Escalonador* escalonadorInit();
 
-int insereAptos(Escalonador* escalonator, TCB_t *thread);
+void escalonadorInit();
 
-int removeAptos(Escalonador* escalonator);
+int insereAptos(TCB_t *thread);
 
-int insereBloqs(Escalonador* escalonator, TCB_t *thread);
+int removeAptos();
 
-int removeBloqs(Escalonador* escalonator);
+int insereBloqs(TCB_t *thread);
+
+int removeBloqs();
 
 void escalonadorExec();
 
 void trocaContexto();
 
 void liberaEscalonador(int id);
+
+TCB_t* getThreadEmExer();
+
+Escalonador* getEscalonador();
+
+PFILA2 getFilaAptos();
+
+PFILA2 getFilaBloqs();
 
 
 #endif

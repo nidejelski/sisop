@@ -5,7 +5,10 @@
 CC=gcc
 LIB_DIR=../lib
 
-all: exemplo mandel teste_vetor barbeiro filosofos prodcons series
+all: main exemplo mandel teste_vetor barbeiro filosofos prodcons series
+
+main: main.c $(LIB_DIR)/libcthread.a
+	$(CC) -o main main.c -L$(LIB_DIR) -lcthread -Wall
 
 exemplo: exemplo.c $(LIB_DIR)/libcthread.a
 	$(CC) -o exemplo exemplo.c -L$(LIB_DIR) -lcthread -Wall

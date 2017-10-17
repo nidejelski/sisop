@@ -11,6 +11,7 @@
 #define __cthread__
 
 #include "support.h"
+#include "escalonador.h"
 
 typedef struct s_sem {
 	int	count;	// indica se recurso está ocupado ou não (livre > 0, ocupado = 0)
@@ -26,6 +27,7 @@ int cjoin(int tid);
 int csem_init(csem_t *sem, int count);
 int cwait(csem_t *sem);
 int csignal(csem_t *sem);
+
 
 
 #endif

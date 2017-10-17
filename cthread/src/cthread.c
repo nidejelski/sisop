@@ -4,6 +4,7 @@
 #include "support.h"
 #include "cdata.h"
 #include "cthread.h"
+#include "escalonador.h"
 
 #define TAMANHO_PILHA 16384
 #define MAXIMO_THREAD 100
@@ -21,7 +22,11 @@ Quando executada corretamente: retorna um valor positivo, que representa o ident
 Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
 
+
 int ccreate(void* (*start)(void*), void *arg, int prio){
+
+	if(!getIniciado())
+		escalonadorInit();
 
     ucontext_t contextoNovo;
 
@@ -48,13 +53,13 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 
     //teste Insere APTOS
     if (threadID == 1){
-        if (insereAptos(arg, t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
+        if (insereAptos(t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
         else printf("\nFALHA APTOS\n");
     }
 
     //teste Insere BLOQS
     else if (threadID == 2){
-        if (insereBloqs(arg, t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
+        if (insereBloqs(t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
         else printf("\nFALHA BLOQS\n");
     }
 
