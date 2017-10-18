@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cthread.h"
-//#include "cthread.c"
+#include "cthread.c"
 #include "support.h"
 #include "escalonador.h"
-//#include "escalonador.c"
+#include "escalonador.c"
 
 //testes
 void f1(){
@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     if (NextFila2(getFilaAptos()) == -1) printf ("Lista de Aptos Vazia! \n");
 
     //Testa qual thread está em execução
-    TCB_t* teste = getThreadEmExer();
-    if (teste == NULL) 
+    TCB_t* teste = getThreadEmExec();
+    if (teste == NULL)
         printf ("\n THREAD EM EXECUCAO: NULL \n");
-    else 
+    else
         printf ("\n THREAD EM EXECUCAO: %d ", teste->tid);
 
 
@@ -96,11 +96,11 @@ int main(int argc, char *argv[])
     //teste de EXECUCAO DA THREAD
     escalonadorExec();
 
-    teste = getThreadEmExer();
+    teste = getThreadEmExec();
     //testa qual Thread esta em execucao no momento
-    if (teste == NULL) 
+    if (teste == NULL)
         printf ("\n THREAD EM EXECUCAO: NULL \n");
-    else 
+    else
         printf ("\n THREAD EM EXECUCAO: %d ", teste->tid);
 
 
