@@ -23,7 +23,19 @@ Retorno:
 Quando executada corretamente: retorna um valor positivo, que representa o identificador da thread criada
 Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
+int pegaTamFila(PFILA2 fila){
+    int i=1;
 
+    if (FirstFila2(fila) == 0){
+        while(NextFila2(fila) == 0) {
+            i++;
+        }
+    }
+    else return 0;
+
+    FirstFila2(fila);
+    return i;
+}
 
 int ccreate(void* (*start)(void*), void *arg, int prio){
 
@@ -53,26 +65,46 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
     printf ("\nTID: %d \n", t->tid);
 
 
-    //teste Insere APTOS
-    if (threadID == 1){
+    int tamAptos,tamBloqs;
+
+    tamAptos = pegaTamFila(escalonator->filaAptos);
+    tamBloqs = pegaTamFila(escalonator->filaBloqs);
+
+    //Garante o maximo de threads
+    if (tamAptos + tamBloqs < MAXIMO_THREAD){
         if (insereAptos(t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
-        else printf("\nFALHA APTOS\n");
+        return t->tid;
     }
+    else {
+        printf("ATINGIU MAXIMO DE THREADS!");
+        free(t);
+        free(&contextoNovo);
+        return -1;
+    }
+
+    //teste Insere APTOS
+    //if (threadID == 2){
+    //    if (insereAptos(t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
+    //    else printf("\nFALHA APTOS\n");
+    //}
 
     //teste Insere BLOQS
-    else if (threadID == 2){
-        if (insereBloqs(t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
-        else printf("\nFALHA BLOQS\n");
-    }
+    //else if (threadID == 3){
+    //    if (insereBloqs(t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
+    //    else printf("\nFALHA BLOQS\n");
+    //}
 
-	return t->tid;
+	//return t->tid;
 }
 
 
 void ccyield(void)
 {
-	if(!getIniciado())
-		escalonadorInit();
+    //Comentado por Daniel em 18/10 - Erro floating point exception
+	//if(!getIniciado())
+	//	escalonadorInit();
+
+    printf ("\n ENTROU EM CCYIELD \n ");
 
 	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade
 
@@ -94,24 +126,17 @@ void ccyield(void)
 /*
 int sched_dispatch(int reschedulecurrent){
 	FIFO_t *currentfifo = sched_choose_FIFO();
-
 	if (currentfifo == NULL)
 		return -1;
-
 	TCB_t *prevtcb = currenttcb;
 	TCB_t *nexttcb = sched_get_next_thread(currentfifo);1
-
 	if (nexttcb == NULL)
 		return -1;
-
 	if (reschedulecurrent)
 		sched_add_thread(currenttcb);
-
 	currenttcb = nexttcb;
-
 	tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
 	int result = tcb_swapcontext(prevtcb,currenttcb);
-
 	return result;
 }
 */
