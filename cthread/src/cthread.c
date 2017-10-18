@@ -13,16 +13,6 @@ int threadID = 0;
 
 extern Escalonador* escalonator;
 
-/*--------------------------------------------------------------------
-Função: CCREATE
-Parâmetros:
-start: ponteiro para a função que a thread executará.
-arg: um parâmetro que pode ser passado para a thread na sua criação. (Obs.: é um único parâmetro. Se for necessário
-passar mais de um valor deve-se empregar um ponteiro para uma struct)
-Retorno:
-Quando executada corretamente: retorna um valor positivo, que representa o identificador da thread criada
-Caso contrário, retorna um valor negativo.
---------------------------------------------------------------------*/
 int pegaTamFila(PFILA2 fila){
     int i=1;
 
@@ -37,6 +27,16 @@ int pegaTamFila(PFILA2 fila){
     return i;
 }
 
+/*--------------------------------------------------------------------
+Função: CCREATE
+Parâmetros:
+start: ponteiro para a função que a thread executará.
+arg: um parâmetro que pode ser passado para a thread na sua criação. (Obs.: é um único parâmetro. Se for necessário
+passar mais de um valor deve-se empregar um ponteiro para uma struct)
+Retorno:
+Quando executada corretamente: retorna um valor positivo, que representa o identificador da thread criada
+Caso contrário, retorna um valor negativo.
+--------------------------------------------------------------------*/
 int ccreate(void* (*start)(void*), void *arg, int prio){
 
 	if(!getIniciado())
