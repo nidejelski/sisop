@@ -9,6 +9,8 @@ Escalonador* escalonator;
 
 int escalonador_iniciado = 0;
 
+TCB_t* maintct;
+
 void escalonadorInit(){
 	//instancia escalonador
     escalonator = (Escalonador*) malloc(sizeof(Escalonador));
@@ -139,6 +141,19 @@ void escalonadorExec(){
 	}
 
 }
+
+TCB_t* getNextThread()
+{
+    /* 
+    tem que retornar o elemetno no começo ou no final da fila (temos que decidir para que lado 
+    nossa fila vai ser ordenada)
+    */
+    // tá retornando null só para compilar
+    return NULL;
+
+}
+
+
 /*
 void trocaContexto(){
 	//if(NextFila2(escalonator->filaAptos) != -1) {  //se fila não for vazia
@@ -147,8 +162,12 @@ void trocaContexto(){
 		//setcontext(escalonator->threadEmExec->contexto); // executa thread
 	//}
 */
-
-TCB_t* getThreadEmExer()
+/*
+TCB_t* createTCB()
+{
+}
+*/
+TCB_t* getThreadEmExec()
 {
     if(escalonador_iniciado)
         return escalonator->threadEmExec;

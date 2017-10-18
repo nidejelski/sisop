@@ -64,19 +64,52 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
     }
 
 	return t->tid;
-
-        //Conferência de maximo de threads (100)
-	//Algo do tipo: ( (escalonador->fila_aptos->size + escalonador->fila_bloqueados->size ) < MAXIMO_THREAD ))
-   //     if( ([NR. THREADS NA FILA DE APTOS] + [NR. THREADS NA FILA DE BLOQUEADOS]) < MAXIMO_THREAD){
-                  //Insere na fila de APTOS
-                  //insereAptos(escalonador, t);
-    //              return t->tid;
-	//}
-	//else{
-		  //Erro
-	//	  printf("Excedido o numero maximo de threads - THREAD: %d não foi criada\n",t->tid);
-//	  free(contextoNovo);
-//		  free(t);
-//		  return -1;
-//	}
 }
+
+
+void ccyield(void)
+{
+	if(!getIniciado())
+		escalonadorInit();
+
+	///provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade
+
+	if(insereAptos(escalonator->threadEmExec) == 0)
+		printf("Thread atual inserida em aptos\n");
+	else
+		printf("Falha ao inserir\n");
+
+	escalonadorExec();
+
+	/*
+	if(setContext(atual.context) != -1)
+		printf("contexto atualizado\n");
+	else
+		printf("Erro\n");
+	*/
+}
+
+/*
+int sched_dispatch(int reschedulecurrent){
+	FIFO_t *currentfifo = sched_choose_FIFO();
+
+	if (currentfifo == NULL)
+		return -1;
+
+	TCB_t *prevtcb = currenttcb;
+	TCB_t *nexttcb = sched_get_next_thread(currentfifo);1
+
+	if (nexttcb == NULL)
+		return -1;
+
+	if (reschedulecurrent)
+		sched_add_thread(currenttcb);
+
+	currenttcb = nexttcb;
+
+	tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
+	int result = tcb_swapcontext(prevtcb,currenttcb);
+
+	return result;
+}
+*/
