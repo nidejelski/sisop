@@ -11,6 +11,8 @@
 
 int threadID = 0;
 
+extern Escalonador* escalonator;
+
 /*--------------------------------------------------------------------
 Função: CCREATE
 Parâmetros:
@@ -35,7 +37,7 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	contextoNovo.uc_stack.ss_size = TAMANHO_PILHA;
 
 	//No fim da função tem que retornar pro escalonador
-	contextoNovo.uc_link = NULL;//[CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador
+	contextoNovo.uc_link = escalonator->contexto_escalonador;//[CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador
 	getcontext(&contextoNovo);
 	makecontext(&contextoNovo,(void(*)(void))start,1,arg);
 
@@ -72,7 +74,7 @@ void ccyield(void)
 	if(!getIniciado())
 		escalonadorInit();
 
-	///provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade
+	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade
 
 	if(insereAptos(escalonator->threadEmExec) == 0)
 		printf("Thread atual inserida em aptos\n");
