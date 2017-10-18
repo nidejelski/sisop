@@ -144,8 +144,8 @@ void escalonadorExec(){
 
 TCB_t* getNextThread()
 {
-    /* 
-    tem que retornar o elemetno no começo ou no final da fila (temos que decidir para que lado 
+    /*
+    tem que retornar o elemetno no começo ou no final da fila (temos que decidir para que lado
     nossa fila vai ser ordenada)
     */
     // tá retornando null só para compilar
