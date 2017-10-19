@@ -77,7 +77,7 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
     }
     else {
         printf("ATINGIU MAXIMO DE THREADS!");
-        //free(t->context)
+        //free(t->context)   <<<<<<<<<<<<<<<<<<<<<<<<<<< ver depois
         free(t);
         //free(contextoNovo);
         return -1;
@@ -123,6 +123,36 @@ void ccyield(void)
 		printf("Erro\n");
 	*/
 }
+
+
+int cjoin (int tid){	
+	escalonadorInit();
+
+	TCB_t *thread = existeThread(tid); //thread solicitada para cjoin
+	TCB_t *threadExec = threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO
+
+	if (thread == NULL){	//se a thread nao existe
+		printf("ERRO: Thread %d nao existe\n",tid);
+		return (-1);
+	}
+	//testa se essa thread é esperada por alguma outra thread
+	if (thread->espera == 0){	//é zero quando nenhuma outra fez cjoin para essa thr
+			getcontext(&(threadExec->context)); //verificar essa linha!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			thread->aguardada_por = threadExec->tid;	//a que está em exec espera pela thr que está sendo setada no campo espera
+			threadExec->aguarda_termino = tid;	//era nossa exec que aguarda o fim da thr->tid
+			threadExec->state = PROCST_BLOQ;
+			//manda thr em exec para fila de bloq
+			//encerra função em exec
+			//chama escalonador
+		}
+	else{
+		printf("ERRO: impossivel realizar cjoin para a thread %d \n", tid );
+		return(-1);
+	}
+	
+}
+
 
 /*
 int sched_dispatch(int reschedulecurrent){
