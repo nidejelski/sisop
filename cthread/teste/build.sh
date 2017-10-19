@@ -1,2 +1,5 @@
-gcc -c main.c -I"include"
-gcc main.o bin/support.o bin/escalonador.o bin/cthread.o -o main
+gcc -c createejoin1.c
+gcc createejoin1.o ../bin/support.o ../bin/cthread.o ../bin/escalonador.o ../bin/tcb.o -o teste1
+
+#gcc -o teste createejoin1.c -L"../lib" -lcthread -Wall
+

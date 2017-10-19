@@ -5,11 +5,14 @@
 #include "cdata.h"
 #include "cthread.h"
 #include "escalonador.h"
+#include "tcb.h"
 
 #define TAMANHO_PILHA 16384
 #define MAXIMO_THREAD 100
 
 int threadID = 0;
+int debugPrints = 1;
+int maintcb = 0;
 
 extern Escalonador* escalonator;
 
@@ -27,6 +30,8 @@ int pegaTamFila(PFILA2 fila){
     return i;
 }
 
+
+
 /*--------------------------------------------------------------------
 Função: CCREATE
 Parâmetros:
@@ -38,32 +43,28 @@ Quando executada corretamente: retorna um valor positivo, que representa o ident
 Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
 int ccreate(void* (*start)(void*), void *arg, int prio){
+	if(debugPrints)
+		printf("Entrando em ccreate... ");
 
 	if(!getIniciado())
 		escalonadorInit();
 
-    ucontext_t contextoNovo;
+	if(!maintcb){
+		if(debugPrints)
+			printf("Criando thread de main\n");
+		maintcb = 1;
+		TCB_t* main = createTCB(0);
+		getcontext(&main->context);
+		setThreademExec(main);
 
-	TCB_t* t = (TCB_t*) malloc(sizeof(TCB_t));
-	contextoNovo.uc_stack.ss_sp = (char*)malloc(TAMANHO_PILHA);
-	contextoNovo.uc_stack.ss_size = TAMANHO_PILHA;
+		/// adiciona na lista de threads existentes <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	}
 
-	//No fim da função tem que retornar pro escalonador
-	contextoNovo.uc_link = escalonator->contexto_escalonador;//[CONTEXTO ESCALONADOR]; //algo do tipo: escalonador->contexto_escalonador
-	getcontext(&contextoNovo);
-	makecontext(&contextoNovo,(void(*)(void))start,1,arg);
+	TCB_t* t = createTCB(++threadID);
+	createContext(t ,&execThread, start, arg, TAMANHO_PILHA);
 
-	//Seta parametros da TCB
-	threadID++;
-	t->tid = threadID;
-	t->state = PROCST_CRIACAO;
-	t->prio = prio;
-
-	//G = contextoNovo;
-	t->context = contextoNovo;
-
-    printf ("\nTID: %d \n", t->tid);
-
+	if(debugPrints)
+    	printf ("\nTID: %d \n", t->tid);
 
     int tamAptos,tamBloqs;
 
@@ -72,56 +73,44 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 
     //Garante o maximo de threads
     if (tamAptos + tamBloqs < MAXIMO_THREAD){
-        if (insereAptos(t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
+        if (insereAptos(t) == 0) 
+        	if(debugPrints) 
+        		printf ("\nSUCESSO INSERE APTOS\n");
         return t->tid;
     }
     else {
-        printf("ATINGIU MAXIMO DE THREADS!");
+    	if(debugPrints)
+        	printf("ATINGIU MAXIMO DE THREADS!");
         //free(t->context)   <<<<<<<<<<<<<<<<<<<<<<<<<<< ver depois
         free(t);
         //free(contextoNovo);
         return -1;
     }
 
-    //teste Insere APTOS
-    //if (threadID == 2){
-    //    if (insereAptos(t) == 0) printf ("\nSUCESSO INSERE APTOS\n");
-    //    else printf("\nFALHA APTOS\n");
-    //}
-
-    //teste Insere BLOQS
-    //else if (threadID == 3){
-    //    if (insereBloqs(t) == 0) printf ("\nSUCESSO INSERE BLOQS\n");
-    //    else printf("\nFALHA BLOQS\n");
-    //}
-
-	//return t->tid;
 }
 
 
-void ccyield(void)
+int cyield(void)
 {
-    //Comentado por Daniel em 18/10 - Erro floating point exception
 	//if(!getIniciado())
 	//	escalonadorInit();
 
-    printf ("\n ENTROU EM CCYIELD \n ");
+	if(debugPrints)
+    	printf ("\n ENTROU EM CCYIELD \n ");
 
-	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade
+	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade  <<<<<<<<<<<<<
 
-	if(insereAptos(escalonator->threadEmExec) == 0)
-		printf("Thread atual inserida em aptos\n");
+
+	if(maintcb != 0 && insereAptos(escalonator->threadEmExec) == 0)
+		if(debugPrints)
+			printf("Thread atual inserida em aptos\n");
 	else
-		printf("Falha ao inserir\n");
+		if(debugPrints)
+			printf("Falha ao inserir\n");
 
 	escalonadorExec();
 
-	/*
-	if(setContext(atual.context) != -1)
-		printf("contexto atualizado\n");
-	else
-		printf("Erro\n");
-	*/
+	return 0;
 }
 
 
@@ -129,7 +118,7 @@ int cjoin (int tid){
 	escalonadorInit();
 
 	TCB_t *thread = existeThread(tid); //thread solicitada para cjoin
-	TCB_t *threadExec = threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO
+	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	if (thread == NULL){	//se a thread nao existe
 		printf("ERRO: Thread %d nao existe\n",tid);

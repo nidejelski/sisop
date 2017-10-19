@@ -142,3 +142,35 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+
+/*
+#include "../include/support.h"
+#include "../include/cthread.h"
+#include <stdio.h>
+
+void foo1(int x)
+{
+    printf("Dentro de foo1 com x = %d\n", x);
+}
+
+void foo2(int x)
+{
+    printf("Dentro de foo2 com x = %d\n", x);
+}
+
+int main()
+{
+    printf("Iniciando main...");
+
+    int x = ccreate(foo1, 1, 0);
+    x = create(foo2, 2, 0);
+
+    cyield();
+    cyield();
+
+
+    printf("Saindo de main...");
+    return 0;
+}
+*/

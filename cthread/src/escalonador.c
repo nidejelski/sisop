@@ -4,12 +4,13 @@
 #include "escalonador.h"
 #include "support.h"
 #include "cdata.h"
+#include "tcb.h"
 
 Escalonador* escalonator;
 
 int escalonador_iniciado = 0;
 
-TCB_t* maintct;
+//int maintcb = 0;
 
 void escalonadorInit(){
 	//instancia escalonador
@@ -24,9 +25,10 @@ void escalonadorInit(){
 	escalonator->threadEmExec = NULL;
 
 	//inicia contexto
+    /*
 	ucontext_t* contextoEscalonator = malloc(sizeof(ucontext_t));
 	escalonator->contexto_escalonador = contextoEscalonator;
-
+    */
     printf ("Iniciou escalonador! \n");
 
     escalonador_iniciado = 1;
@@ -34,6 +36,11 @@ void escalonadorInit(){
 
 int getIniciado(){
     return escalonador_iniciado;
+}
+
+void setThreademExec(TCB_t* t)
+{
+    escalonator->threadEmExec = t;
 }
 
 /*-------------------------------------------------------------------
@@ -117,12 +124,12 @@ int removeBloqs(){
 
 void liberaEscalonador(int id){
 	//free()
-	printf ("liberei escalonador \n");
+	printf ("liberei escalonador ?\n");
 }
 
 void escalonadorExec(){
 	/*Define contexto do escalonador. Se thread acabar, vem para esse contexto*/
-	getcontext(escalonator->contexto_escalonador);
+	//getcontext(escalonator->contexto_escalonador);
 
 	//if(escalonator->threadEmExec->tid != 0){ // 0 == MAIN
 	//	liberaEscalonador(escalonator->threadEmExec->tid);
@@ -139,6 +146,27 @@ void escalonadorExec(){
         //NECESSARIO SETAR CONTEXTO!!!! -> DUVIDAS COM O PROFESSOR EM 16/10/2017 --> RESOLVIDO!
         setcontext(&escalonator->threadEmExec->context);
 	}
+    else
+    {
+        printf("fila != 0\n");
+    }
+
+}
+
+void* execThread(void *(*func)(void*),void *arg)
+{
+    func(arg);
+
+    // FUNÇÃO DE TERMINAR A THREAD
+
+    printf("Fim da exec desta thread\n");
+
+    escalonadorExec();
+
+    printf("n eh p vir aqui");
+
+    return NULL;
+
 
 }
 
@@ -199,4 +227,45 @@ PFILA2 getFilaBloqs()
         return NULL;
 }
 
+
+/*Busca uma trhead em uma fila*/
+TCB_t *buscaEmFila(int tid, PFILA2 fila){
+    FirstFila2(fila);
+    TCB_t *busca = (TCB_t*) GetAtIteratorFila2(fila); 
+    while(busca != NULL && busca->tid != tid){  
+        busca = (TCB_t*) GetAtNextIteratorFila2 (escalonator->filaAptos);
+    }
+    return (busca);
+}
+
+/*pesquisa uma tid nas filas de aptos e de bloqueados
+retorna a thred encontrada em qualquer uma das filas, ou NULL em caso de nao encontrar*/
+
+TCB_t *existeThread(int tid){ 
+    TCB_t *busca = buscaEmFila(tid, escalonator->filaAptos);
+    if (busca->tid == tid){
+        return(busca);
+    }
+    busca = buscaEmFila(tid, escalonator->filaBloqs);
+    if (busca->tid == tid){
+        return(busca);
+    }
+    return(NULL); //retorna null quando nao encontra nenhuma thread
+}
+
+/*retorna a thread em execução*/
+//TCB_t threadEmExecucao(){
+//    return(escalonator->threadEmExec);
+//}
+
+int terminoThread(TCB_t threadEmExec){    //nao está pronta!
+    /*
+    threadEmExec->prio = stopTimer();
+    threadEmExec->status = PROCST_TERMINO;
+    threadEmExec->aguarda_termino = 0;
+    //busca aguardada por na lista de blocks e se houver retira de bloqs
+    free(threadEmExec);
+    */
+    return 1; // só para compiular
+}
 

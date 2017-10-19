@@ -11,7 +11,7 @@ CFLAGS=-c
 
 all: libcthread
 
-libcthread: escalonador.o cthread.o
+libcthread: escalonador.o cthread.o insert.o tcb.o
 	mv *.o $(BIN_DIR)
 	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o
 
@@ -23,6 +23,9 @@ cthread.o:
 
 insert.o:
 	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/insert.c
+
+tcb.o:
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/tcb.c
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
