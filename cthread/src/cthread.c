@@ -77,8 +77,9 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
     }
     else {
         printf("ATINGIU MAXIMO DE THREADS!");
+        //free(t->context)
         free(t);
-        free(&contextoNovo);
+        //free(contextoNovo);
         return -1;
     }
 

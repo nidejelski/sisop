@@ -16,10 +16,13 @@ libcthread: escalonador.o cthread.o
 	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o
 
 escalonador.o:
-	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/escalonador.c $(BIN_DIR)/support.o
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/escalonador.c
 
 cthread.o:
-	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/cthread.c $(BIN_DIR)/support.o
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/cthread.c
+
+insert.o:
+	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/insert.c
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
