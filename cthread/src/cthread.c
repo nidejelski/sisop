@@ -43,7 +43,7 @@ Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
 int ccreate(void* (*start)(void*), void *arg, int prio){
 	if(debugPrints)
-		printf("Entrando em ccreate... ");
+		printf("Entrando em ccreate... \n");
 
 	if(!esca_getIniciado())
 		esca_escalonadorInit();
@@ -63,23 +63,18 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	tcb_createContext(t ,&esca_execThread, start, arg, TAMANHO_PILHA);
 
 	if(debugPrints)
-    	printf ("\nTID: %d \n", t->tid);
+    	printf ("TID criado: %d \n", t->tid);
 
-    int tamAptos,tamBloqs;
-
-    tamAptos = 0;//pegaTamFila(escalonator->filaAptos);
-    tamBloqs = 0;//pegaTamFila(escalonator->filaBloqs);
+    int tamFilas = filas_tam();
 
     //Garante o maximo de threads
-    if (tamAptos + tamBloqs < MAXIMO_THREAD){
-        if (filas_insereAptos(t) == 0) 
-        	if(debugPrints) 
-        		printf ("\nSUCESSO INSERE APTOS\n");
+    if (tamFilas < MAXIMO_THREAD){
+        if (filas_insereAptos(t) != 0) 
+        	printf("Erro ao inserir\n");
         return t->tid;
     }
     else {
-    	if(debugPrints)
-        	printf("ATINGIU MAXIMO DE THREADS!");
+        printf("ATINGIU MAXIMO DE THREADS!");
         //free(t->context)   <<<<<<<<<<<<<<<<<<<<<<<<<<< ver depois
         free(t);
         //free(contextoNovo);
@@ -95,19 +90,16 @@ int cyield(void)
 	//	escalonadorInit();
 
 	if(debugPrints)
-    	printf ("\n ENTROU EM CCYIELD \n ");
+    	printf ("ENTROU EM CCYIELD \n ");
 
 	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade  <<<<<<<<<<<<<
 
 
-	if(maintcb != 0 && filas_insereAptos(esca_getThreadEmExec()) == 0)
-		if(debugPrints)
-			printf("Thread atual inserida em aptos\n");
-	else
-		if(debugPrints)
-			printf("Falha ao inserir\n");
+	if(maintcb != 0 && filas_insereAptos(esca_getThreadEmExec()) != 0)
+		printf("Falha ao inserir\n");
 
-	esca_dispatcher();
+	if(esca_dispatcher() == -1)
+		return -1;
 
 	return 0;
 }

@@ -20,18 +20,47 @@ void esca_escalonadorInit(){
 }
 
 
+/*   << função de outro trabalho do dispatcher
+// realiza o despache de threads
+int sched_dispatch(int reschedulecurrent){
+    FIFO_t *currentfifo = sched_choose_FIFO();
+
+    if (currentfifo == NULL)
+        return -1;
+
+    TCB_t *prevtcb = currenttcb;
+    TCB_t *nexttcb = sched_get_next_thread(currentfifo);
+
+    if (nexttcb == NULL)
+        return -1;
+
+    if (reschedulecurrent)
+        sched_add_thread(currenttcb);
+
+    currenttcb = nexttcb;
+
+    tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
+    int result = tcb_swapcontext(prevtcb,currenttcb);
+
+    return result;
+}
+*/
+
+
 /// será que seria necessário colocar essa função noutro arquivo? 
-void esca_dispatcher(){
+int esca_dispatcher(){
 
 	if (!filas_aptosVazia()){
-		printf ("\n!!!!!TROCA CONTEXTO!!!!\n");
-		threadEmExec = (TCB_t*)filas_popAptos();
-	    if (threadEmExec != NULL) 
-            printf ("   SUCESSO REMOVE APTOS E COLOCA EM EXEC \n");
 
+        TCB_t* anterior = threadEmExec;
+        TCB_t* proxima = (TCB_t*)filas_popAptos();
+
+        threadEmExec = proxima;
         //NECESSARIO SETAR CONTEXTO!!!! -> DUVIDAS COM O PROFESSOR EM 16/10/2017 --> RESOLVIDO!
-        setcontext(&threadEmExec->context);  /// <<<<<<<<<<<<<<<< acho que tem que ser um swap na verdade
+        //setcontext(&threadEmExec->context);  /// <<<<<<<<<<<<<<<< acho que tem que ser um swap na verdade
+        return swapcontext(&anterior->context, &threadEmExec->context);  /// retorna -1 se erro, e não retorna caso contrário
 	}
+    return -1;
 }
 
 
@@ -97,28 +126,3 @@ void liberaEscalonador(int id){
 */
 
 
-/*   << função de outro trabalho do dispatcher
-// realiza o despache de threads
-int sched_dispatch(int reschedulecurrent){
-    FIFO_t *currentfifo = sched_choose_FIFO();
-
-    if (currentfifo == NULL)
-        return -1;
-
-    TCB_t *prevtcb = currenttcb;
-    TCB_t *nexttcb = sched_get_next_thread(currentfifo);
-
-    if (nexttcb == NULL)
-        return -1;
-
-    if (reschedulecurrent)
-        sched_add_thread(currenttcb);
-
-    currenttcb = nexttcb;
-
-    tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
-    int result = tcb_swapcontext(prevtcb,currenttcb);
-
-    return result;
-}
-*/

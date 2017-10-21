@@ -7,8 +7,8 @@
 /// inicializa algumas variáveis necessárias 
 void esca_escalonadorInit();
 
-/// faz o dispatch de threads
-void esca_dispatcher();
+/// faz o dispatch de threads. Retorna -1 caso de erro.
+int esca_dispatcher();
 
 /// função que executa uma thread
 void* esca_execThread(void *(*func)(void*),void *arg);

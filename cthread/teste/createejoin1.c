@@ -14,7 +14,7 @@ void foo2(int x)
 
 int main()
 {
-	printf("Iniciando main...");
+	printf("Iniciando main...\n");
 	int cont = 0;
 
 	
@@ -22,6 +22,8 @@ int main()
 	x = ccreate(foo2, cont++, 0);
 	
 	cont= 10;
+	cyield();
+	cyield();
 	cyield();
 	cyield();
 
