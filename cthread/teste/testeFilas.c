@@ -8,7 +8,7 @@
 
 int main()
 {
-	filasInit();
+	filas_Init();
 
 	TCB_t* tcb1, *tcb2, *tcb3, *tcb4, *tcb5;
 	tcb1 = (TCB_t*) malloc(sizeof(TCB_t));
@@ -94,6 +94,27 @@ int main()
 		printf("t == NULL\n");
 	else
 		printf("t = %d\n", t->tid);
+
+	printf("Tamanho das filas = %d\n", filas_tam());
+
+
+	if(filas_aptosVazia())
+		printf("Fila de aptos vazia\n");
+	else	
+		printf("Fila de aptos tem algo\n");
+
+	filas_popAptos();
+
+	if(filas_aptosVazia())
+		printf("Fila de aptos vazia\n");
+	else	
+		printf("Fila de aptos tem algo\n");
+
+	filas_printTidsFilas();
+
+	printf("Tamanho das filas = %d\n", filas_tam());	
+
+
 
 
 	return 0;

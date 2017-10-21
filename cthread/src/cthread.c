@@ -14,8 +14,7 @@ int threadID = 0;
 int debugPrints = 1;
 int maintcb = 0;
 
-extern Escalonador* escalonator;
-
+/*
 int pegaTamFila(PFILA2 fila){
     int i=1;
 
@@ -29,7 +28,7 @@ int pegaTamFila(PFILA2 fila){
     FirstFila2(fila);
     return i;
 }
-
+*/
 
 
 /*--------------------------------------------------------------------
@@ -46,34 +45,34 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	if(debugPrints)
 		printf("Entrando em ccreate... ");
 
-	if(!getIniciado())
-		escalonadorInit();
+	if(!esca_getIniciado())
+		esca_escalonadorInit();
 
 	if(!maintcb){
 		if(debugPrints)
 			printf("Criando thread de main\n");
 		maintcb = 1;
-		TCB_t* main = createTCB(0);
+		TCB_t* main = tcb_createTCB(0);
 		getcontext(&main->context);
-		setThreademExec(main);
+		esca_setThreademExec(main);
 
-		/// adiciona na lista de threads existentes <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		/// adiciona na lista de threads existentes <<<<<<<<<<<<<<<<<<<<<<<<<<<< caso precise isso algum dia
 	}
 
-	TCB_t* t = createTCB(++threadID);
-	createContext(t ,&execThread, start, arg, TAMANHO_PILHA);
+	TCB_t* t = tcb_createTCB(++threadID);
+	tcb_createContext(t ,&esca_execThread, start, arg, TAMANHO_PILHA);
 
 	if(debugPrints)
     	printf ("\nTID: %d \n", t->tid);
 
     int tamAptos,tamBloqs;
 
-    tamAptos = pegaTamFila(escalonator->filaAptos);
-    tamBloqs = pegaTamFila(escalonator->filaBloqs);
+    tamAptos = 0;//pegaTamFila(escalonator->filaAptos);
+    tamBloqs = 0;//pegaTamFila(escalonator->filaBloqs);
 
     //Garante o maximo de threads
     if (tamAptos + tamBloqs < MAXIMO_THREAD){
-        if (insereAptos(t) == 0) 
+        if (filas_insereAptos(t) == 0) 
         	if(debugPrints) 
         		printf ("\nSUCESSO INSERE APTOS\n");
         return t->tid;
@@ -101,24 +100,25 @@ int cyield(void)
 	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade  <<<<<<<<<<<<<
 
 
-	if(maintcb != 0 && insereAptos(escalonator->threadEmExec) == 0)
+	if(maintcb != 0 && filas_insereAptos(esca_getThreadEmExec()) == 0)
 		if(debugPrints)
 			printf("Thread atual inserida em aptos\n");
 	else
 		if(debugPrints)
 			printf("Falha ao inserir\n");
 
-	escalonadorExec();
+	esca_dispatcher();
 
 	return 0;
 }
 
 
 int cjoin (int tid){	
-	escalonadorInit();
+	esca_escalonadorInit();
 
-	TCB_t *thread = existeThread(tid); //thread solicitada para cjoin
-	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	TCB_t *thread = filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
+	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< comentei aqui só pra compilar
+	/// depois se der troca o nome dessa variável, pq pode confundir com a que tem em escalonador.c
 
 	if (thread == NULL){	//se a thread nao existe
 		printf("ERRO: Thread %d nao existe\n",tid);

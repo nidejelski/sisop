@@ -1,51 +1,24 @@
 #ifndef __escalonador__
 #define __escalonador__
 
-
-#include "support.h"
 #include "cdata.h"
-#include "ucontext.h"
 
-typedef struct sEscalonador{
-    PFILA2 filaAptos;
-    PFILA2 filaBloqs;
-    TCB_t*  threadEmExec; // thread que esta rodando
-    //ucontext_t* contexto_escalonador;	// contexto escalonador
-} Escalonador;
 
-TCB_t* createTCB();
+/// inicializa algumas variáveis necessárias 
+void esca_escalonadorInit();
 
-void setThreademExec(TCB_t* t);
+/// faz o dispatch de threads
+void esca_dispatcher();
 
-void escalonadorInit();
+/// função que executa uma thread
+void* esca_execThread(void *(*func)(void*),void *arg);
 
-int insereAptos(TCB_t *thread);
 
-int removeAptos();
+int esca_getIniciado();
 
-int insereBloqs(TCB_t *thread);
+void esca_setThreademExec(TCB_t* t);
 
-int removeBloqs();
-
-void escalonadorExec();
-
-void* execThread(void *(*func)(void*),void *arg);
-
-void trocaContexto();
-
-void liberaEscalonador(int id);
-
-TCB_t* getThreadEmExer();
-
-Escalonador* getEscalonador();
-
-PFILA2 getFilaAptos();
-
-PFILA2 getFilaBloqs();
-
-TCB_t *buscaEmFila(int tid, PFILA2 fila);
-
-TCB_t *existeThread(int tid);
+TCB_t* esca_getThreadEmExec();
 
 
 #endif

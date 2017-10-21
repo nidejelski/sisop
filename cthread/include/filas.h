@@ -10,7 +10,7 @@
 	Retorna == 0 caso sucesso
 	retorna != caso não;
 */
-int filasInit();
+int filas_Init();
 
 /*
 	Insere ordenado pelo Tid nas filas. 
@@ -22,11 +22,27 @@ int filas_insereBloqs(TCB_t *thread);
 
 
 /*
+	retorna 1 caso a fila esteja vazia, 0 c.c.
+*/
+int filas_aptosVazia();
+
+/*
 	Retorna o primeiro elemento da fila, REMOVENDO-O dela. 
 	Retorna NULL em caso de erro.
 */
 TCB_t* filas_popAptos();
 TCB_t* filas_popBloqs();
+
+/*
+	retorna 0 caso sucesso, != 0 c.c.
+*/
+int filas_removeBloqs(int tid);
+
+
+/*
+	retorna a soma do tamanho das 2 filas
+*/
+int filas_tam();
 
 
 // printa os Tids dos elementos da fila. Usado para debug

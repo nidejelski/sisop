@@ -6,9 +6,9 @@
 #include "cdata.h"
 #include "cthread.h"
 
-TCB_t* createTCB(int tid);
+TCB_t* tcb_createTCB(int tid);
 
-void createContext(TCB_t* t,void* exec, void* func, void* arg, int tamPilha);
+void tcb_createContext(TCB_t* t,void* exec, void* func, void* arg, int tamPilha);
 
 #endif
 

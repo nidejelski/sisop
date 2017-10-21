@@ -17,10 +17,10 @@ int main()
 	printf("Iniciando main...");
 	int cont = 0;
 
-	/*
+	
 	int x = ccreate(foo1, cont++, 0);
 	x = ccreate(foo2, cont++, 0);
-	*/
+	
 	cont= 10;
 	cyield();
 	cyield();

@@ -13,7 +13,7 @@
 PFILA2 filaAptos;	
 PFILA2 filaBloqs;
 
-int filasInit()
+int filas_Init()
 {
 	filaAptos = (PFILA2)malloc(sizeof(PFILA2));
 	filaBloqs = (PFILA2)malloc(sizeof(PFILA2));
@@ -54,15 +54,40 @@ Ret:	==0, se conseguiu
 	    !=0, caso contrário
 -------------------------------------------------------------------*/
 int filas_insereAptos(TCB_t* thread){
-	/*
-    if(AppendFila2(escalonator->filaAptos, thread) == 0) {
-       printf("Inseriu na fila de Aptos\n");
-       return 0;
-    }
-    else printf("Oops!");
-   	*/
+
     return filas_InsertByPrio(filaAptos, thread);
 
+}
+
+
+
+int filas_aptosVazia()
+{
+	return FirstFila2(filaAptos);
+}
+
+
+int filas_tam()
+{
+	int cont = 0;
+	TCB_t *tcb_it;
+
+	// pfile vazia?
+	if (FirstFila2(filaAptos)==0) {
+		do {
+			tcb_it = GetAtIteratorFila2(filaAptos);
+			cont++;
+		} while (NextFila2(filaAptos)==0);
+	}	
+	// pfile vazia?
+	if (FirstFila2(filaBloqs)==0) {
+		do {
+			tcb_it = GetAtIteratorFila2(filaBloqs);
+			cont++;
+		} while (NextFila2(filaBloqs)==0);
+	}	
+
+	return cont;
 }
 
 
@@ -73,13 +98,7 @@ Ret:	==0, se conseguiu
 -------------------------------------------------------------------*/
 
 int filas_insereBloqs(TCB_t* thread){
-	/*
-    if(AppendFila2(escalonator->filaBloqs, thread) == 0) {
-       printf("Inseriu na fila de Bloqs\n");
-       return 0;
-    }
-    else printf("Oops!");
-    */
+
     /// como não precisa se preocupar com a ordem na fila de bloqueados só insere no fim 
     return AppendFila2(filaBloqs, (void *)thread);
 }
@@ -113,6 +132,22 @@ TCB_t* filas_popAptos()
 TCB_t* filas_popBloqs()
 {
 	return filas_popFila(filaAptos);
+}
+
+int filas_removeBloqs(int tid)
+{
+	TCB_t* it;
+	if(FirstFila2(filaBloqs) == 0)
+	{
+		do
+		{	
+			it = GetAtIteratorFila2(filaBloqs);
+			if(it->tid == tid)
+				return DeleteAtIteratorFila2(filaBloqs);
+		}
+		while(NextFila2(filaBloqs) == 0);
+	}
+	return -1;
 }
 
 
@@ -155,14 +190,7 @@ TCB_t* filas_buscaEmFila(int tid, PFILA2 fila){
 		while(NextFila2(fila) == 0);
 	}
 	return NULL;
-	/*
-    FirstFila2(fila);
-    TCB_t *busca = (TCB_t*) GetAtIteratorFila2(fila); 
-    while(busca != NULL && busca->tid != tid){  
-        busca = (TCB_t*) GetAtNextIteratorFila2 (filaAptos);
-    }
-    return (busca);
-    */
+
 }
 
 /*pesquisa uma tid nas filas de aptos e de bloqueados
