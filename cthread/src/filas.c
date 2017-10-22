@@ -10,17 +10,117 @@
 #include "cdata.h"
 #include "filas.h"
 
+typedef struct fTcbs{
+	int tid;
+	int wait; // wait = -1 que ngm está esperando. Caso wait > 0 a thread id == wait está esperando pelo fim desta
+} simpTcb;
+
+typedef struct s_sem {
+	int	count;	// indica se recurso está ocupado ou não (livre > 0, ocupado = 0)
+	PFILA2	fila; 	// ponteiro para uma fila de threads bloqueadas no semáforo
+} csem_t;
+
+
 PFILA2 filaAptos;	
 PFILA2 filaBloqs;
+PFILA2 listaTcbs;
+
 
 int filas_Init()
 {
+	listaTcbs = (PFILA2)malloc(sizeof(FILA2));
 	filaAptos = (PFILA2)malloc(sizeof(FILA2));
 	filaBloqs = (PFILA2)malloc(sizeof(FILA2));
-	if(filaAptos == NULL || filaBloqs == NULL)
+	if(listaTcbs == NULL || filaAptos == NULL || filaBloqs == NULL)
 		return -1;
 	else
 		return 0;
+}
+
+void filas_insereTcb(int tid){
+	simpTcb *t;
+	t->tid = tid;
+	t->wait = -1;
+	AppendFila2(listaTcbs, (void *)t);
+}
+
+
+
+
+// retorna 0 caso sucesso, != 0 c.c.
+int filas_deletaTcb(int tid){
+	simpTcb* it;
+	if(FirstFila2(listaTcbs) == 0)
+	{
+		do
+		{
+			it = (simpTcb*)GetAtIteratorFila2(listaTcbs);
+			if(it->tid == tid){
+				DeleteAtIteratorFila2(listaTcbs);
+				return 0;
+			}	
+		}
+		while(NextFila2(listaTcbs)==0);
+		return -1;
+	}
+	return -1;
+}
+
+int filas_setThreadWaiting(int tid, int wait) 
+{	
+	simpTcb* it;
+	if(FirstFila2(listaTcbs) == 0)
+	{
+		do
+		{
+			it = (simpTcb*)GetAtIteratorFila2(listaTcbs);
+			if(it->tid == tid){
+				DeleteAtIteratorFila2(listaTcbs);
+				it->wait = wait;
+				AppendFila2(listaTcbs, it);
+				return 0;
+			}	
+		}
+		while(NextFila2(listaTcbs)==0);
+		return -1;
+	}
+	return -1;
+}
+
+int filas_isThreadWaitingFor(int tid)
+{
+	simpTcb* it;
+	if(FirstFila2(listaTcbs) == 0)
+	{
+		do
+		{
+			it = (simpTcb*)GetAtIteratorFila2(listaTcbs);
+			if(it->wait == tid){
+				return it->tid;
+			}	
+		}
+		while(NextFila2(listaTcbs)==0);
+		return -1;
+	}
+	return -1;
+}
+
+int filas_BloqsToAptos(int tid)
+{
+	TCB_t* it;
+	if(FirstFila2(filaBloqs) == 0)
+	{
+		do
+		{	
+			it = GetAtIteratorFila2(filaBloqs);
+			if(it->tid == tid){
+				DeleteAtIteratorFila2(filaBloqs);
+				return filas_insereAptos(it);
+			}
+		}
+		while(NextFila2(filaBloqs) == 0);
+	}
+	return -1;
 }
 
 /*--------------------------------------------------------------------
@@ -73,19 +173,12 @@ int filas_tam()
 	TCB_t *tcb_it;
 
 	// pfile vazia?
-	if (FirstFila2(filaAptos)==0) {
+	if (FirstFila2(listaTcbs)==0) {
 		do {
-			tcb_it = GetAtIteratorFila2(filaAptos);
+			tcb_it = GetAtIteratorFila2(listaTcbs);
 			cont++;
-		} while (NextFila2(filaAptos)==0);
-	}	
-	// pfile vazia?
-	if (FirstFila2(filaBloqs)==0) {
-		do {
-			tcb_it = GetAtIteratorFila2(filaBloqs);
-			cont++;
-		} while (NextFila2(filaBloqs)==0);
-	}	
+		} while (NextFila2(listaTcbs)==0);
+	}
 
 	return cont;
 }
@@ -154,12 +247,12 @@ int filas_removeBloqs(int tid)
 void filas_printTidsFilas() {
 	TCB_t *tcb_it;
 	
-	printf("Fila de aptos:");
+	printf("\nFila de aptos:");
 	// pfile vazia?
 	if (FirstFila2(filaAptos)==0) {
 		do {
 			tcb_it = GetAtIteratorFila2(filaAptos);
-			printf("(id:%d, p:%u) -> ", tcb_it->tid, tcb_it->prio);
+			printf("(id:%d, prio:%u) -> ", tcb_it->tid, tcb_it->prio);
 		} while (NextFila2(filaAptos)==0);
 	}	
 	printf("NULL\n");
@@ -168,15 +261,24 @@ void filas_printTidsFilas() {
 	if (FirstFila2(filaBloqs)==0) {
 		do {
 			tcb_it = GetAtIteratorFila2(filaBloqs);
-			printf("%d -> ", tcb_it->tid);
+			printf("(id:%d, prio:%u) -> ", tcb_it->tid, tcb_it->prio);
 		} while (NextFila2(filaBloqs)==0);
 	}	
+	printf("NULL\n");
+	printf("Fila geral:");
+	if(FirstFila2(listaTcbs) == 0){
+		simpTcb* it;// = GetAtIteratorFila2(listaTcbs);
+		do{
+			it = GetAtIteratorFila2(listaTcbs);
+			printf("(%d, %d) -> ", it->tid, it->wait);
+		}
+		while(NextFila2(listaTcbs) == 0);
+	}
 	printf("NULL\n\n");
 }
 
 
 
-/*Busca uma trhead em uma fila*/
 TCB_t* filas_buscaEmFila(int tid, PFILA2 fila){
 	TCB_t* it;
 	if(FirstFila2(fila) == 0)
@@ -193,9 +295,8 @@ TCB_t* filas_buscaEmFila(int tid, PFILA2 fila){
 
 }
 
-/*pesquisa uma tid nas filas de aptos e de bloqueados
-retorna a thred encontrada em qualquer uma das filas, ou NULL em caso de nao encontrar*/
-
+/*pesquisa uma tid na lista geral de tids
+retorna a 1 caso encontre ou 0 c.c.*/
 TCB_t* filas_existeThread(int tid){ 
     TCB_t *busca = filas_buscaEmFila(tid, filaAptos);
     if (busca != NULL && busca->tid == tid){
@@ -208,58 +309,3 @@ TCB_t* filas_existeThread(int tid){
     return(NULL); //retorna null quando nao encontra nenhuma thread
 }
 
-
-
-
-/*-------------------------------------------------------------------
-Função:	Remove thread na fila de aptos do escalonador
-Ret:	==0, se conseguiu
-	    >0, caso contrário
--------------------------------------------------------------------*/
-
-/*
-int filas_removeAptos(){
-    int fAux = FirstFila2(escalonator->filaAptos);
-    if (fAux == 0){
-        if(DeleteAtIteratorFila2(escalonator->filaAptos) == 0){
-            printf ("\n retirei de APTOS \n");
-            return 0;
-        }
-        else {
-            printf ("fila vazia ou itinval\n");
-            return 1;
-        }
-    }
-    else{
-        printf("fila vazia ou erro | erro : %d", fAux);
-        return 2;
-    }
-}
-*/
-
-/*-------------------------------------------------------------------
-Função:	Remove thread na fila de bloqueados do escalonador
-Ret:	==0, se conseguiu
-	    >0, caso contrário
--------------------------------------------------------------------*/
-
-/*
-int filas_removeBloqs(){
-    int fAux = FirstFila2(escalonator->filaBloqs);
-    if (fAux == 0){
-        if(DeleteAtIteratorFila2(escalonator->filaBloqs) == 0){
-            printf ("\n retirei de BLOQS \n");
-            return 0;
-        }
-        else {
-            printf ("fila vazia ou itinval\n");
-            return 1;
-        }
-    }
-    else{
-        printf("fila vazia ou erro | erro : %d", fAux);
-        return 2;
-    }
-}
-
-*/

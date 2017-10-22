@@ -6,7 +6,6 @@
 #include "tcb.h"
 
 
-
 int escalonador_iniciado = 0;
 TCB_t*  threadEmExec; // thread que esta rodando
 //int maintcb = 0;
@@ -17,7 +16,7 @@ void esca_escalonadorInit(){
     if(filas_Init()!=0)
         printf("Erro criando as filas!\n");
 
-
+    startTimer();
 	threadEmExec = NULL;
     escalonador_iniciado = 1;
 }
@@ -31,7 +30,7 @@ int esca_dispatcher(){
 
         TCB_t* anterior = threadEmExec;
         TCB_t* proxima = (TCB_t*)filas_popAptos();
-
+        startTimer();
         threadEmExec = proxima;
         //NECESSARIO SETAR CONTEXTO!!!! -> DUVIDAS COM O PROFESSOR EM 16/10/2017 --> RESOLVIDO!
         //setcontext(&threadEmExec->context);  /// <<<<<<<<<<<<<<<< acho que tem que ser um swap na verdade
@@ -45,13 +44,21 @@ void* esca_execThread(void *(*func)(void*),void *arg)
 {
     func(arg);
 
-    // FUNÇÃO DE TERMINAR A THREAD    <<<<<<<<<<<<<< ainda não sei se vai precisar na verdade
+    //printf("Fim da exec desta thread\n");
 
-    printf("Fim da exec desta thread\n");
+    int tidEsperando = filas_isThreadWaitingFor(threadEmExec->tid);
+    //printf("threadEmExec->tid = %d e tidEsperando = %d\n", threadEmExec->tid, tidEsperando);
+    if(tidEsperando != -1)
+    {
+        filas_BloqsToAptos(tidEsperando);
+    }
 
+    filas_deletaTcb(threadEmExec->tid);
+
+    ///// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< fazeruma função que libere a memória da tcb
     esca_dispatcher();
 
-    printf("n eh p vir aqui");
+    //printf("n eh p vir aqui!!!!!!!!!!!!\n");
 
     return NULL;
 

@@ -12,6 +12,15 @@
 */
 int filas_Init();
 
+
+void filas_insereTcb(int tid);
+int filas_deletaTcb(int tid);
+int filas_setThreadWaiting(int tid, int wait);
+int filas_isThreadWaitingFor(int tid);
+
+int filas_BloqsToAptos(int tid);
+
+
 /*
 	Insere ordenado pelo Tid nas filas. 
 	Retorna  == 0 caso conseguiu

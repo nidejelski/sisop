@@ -13,7 +13,6 @@
 int threadID = 0;
 int debugPrints = 0;
 int maintcb = 0;
-unsigned int lastTime = 0;
 
 
 /*--------------------------------------------------------------------
@@ -31,7 +30,6 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 		printf("Entrando em ccreate... \n");
 
 	if(!esca_getIniciado()){
-		startTimer();
 		esca_escalonadorInit();
 	}
 
@@ -42,15 +40,14 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 		TCB_t* main = tcb_createTCB(0);
 		getcontext(&main->context);
 		esca_setThreademExec(main);
+		filas_insereTcb(0);
 
 		/// adiciona na lista de threads existentes <<<<<<<<<<<<<<<<<<<<<<<<<<<< caso precise isso algum dia
 	}
 
 	TCB_t* t = tcb_createTCB(++threadID);
 	tcb_createContext(t ,&esca_execThread, start, arg, TAMANHO_PILHA);
-
-	if(0)
-    	printf ("TID criado: %d \n", t->tid);
+	filas_insereTcb(t->tid);
 
     int tamFilas = filas_tam();
 
@@ -74,25 +71,16 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 int cyield(void)
 {
 	if(!esca_getIniciado()){
-		startTimer();
 		esca_escalonadorInit();
 	}
 
-	if(debugPrints)
-    	printf ("ENTROU EM CCYIELD \n ");
-
-	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade  <<<<<<<<<<<<<
-
     TCB_t* t = esca_getThreadEmExec();
     t->prio += stopTimer();
-    startTimer();
 
 	if(maintcb != 0 && filas_insereAptos(t) != 0)
-		printf("Falha ao inserir\n");
+		return -1; //printf("Falha ao inserir\n");
 
-	if(esca_dispatcher() == -1){
-		if(debugPrints)
-			printf("Nao tinha outra thread em aptos, segue o baile\n");
+	if(esca_dispatcher() == -1){ //Nao tinha outra thread em aptos,
 		return -1;
 	}
 
@@ -101,8 +89,11 @@ int cyield(void)
 
 
 int cjoin (int tid){	
-	esca_escalonadorInit();
-
+	if(!esca_getIniciado()){
+		startTimer();
+		esca_escalonadorInit();
+	}
+	/*
 	TCB_t *thread = (TCB_t*)filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
 	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< comentei aqui só pra compilar
 	/// depois se der troca o nome dessa variável, pq pode confundir com a que tem em escalonador.c
@@ -126,7 +117,18 @@ int cjoin (int tid){
 		printf("ERRO: impossivel realizar cjoin para a thread %d \n", tid );
 		return(-1);
 	}
-	
+	*/
+	if(filas_isThreadWaitingFor(tid)==-1) /// já tem alguém esperando por essa tid?
+	{	
+		TCB_t* t = esca_getThreadEmExec();
+		t->prio += stopTimer();
+		filas_insereBloqs(t);
+
+		filas_setThreadWaiting(t->tid, tid);
+		esca_dispatcher();
+	}
+	else
+		return -1;
 }
 
 
@@ -170,5 +172,5 @@ int csignal(csem_t *sem)
 	DeleteAtIteratorFila2(sem->fila);
 	filas_insereAptos(t);
 	return 0;
-
 }
+
