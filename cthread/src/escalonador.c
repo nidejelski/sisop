@@ -6,14 +6,17 @@
 #include "tcb.h"
 
 
+
 int escalonador_iniciado = 0;
 TCB_t*  threadEmExec; // thread que esta rodando
 //int maintcb = 0;
+
 
 void esca_escalonadorInit(){
     
     if(filas_Init()!=0)
         printf("Erro criando as filas!\n");
+
 
 	threadEmExec = NULL;
     escalonador_iniciado = 1;

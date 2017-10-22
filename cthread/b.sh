@@ -1,2 +1,2 @@
-gcc -c -g teste/csem.c
-gcc csem.o bin/support.o bin/cthread.o bin/escalonador.o bin/filas.o bin/tcb.o -o csem
+gcc -c -g teste/createejoin2.c
+gcc createejoin2.o bin/support.o bin/cthread.o bin/escalonador.o bin/filas.o bin/tcb.o -o createejoin2

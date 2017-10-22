@@ -159,7 +159,7 @@ void filas_printTidsFilas() {
 	if (FirstFila2(filaAptos)==0) {
 		do {
 			tcb_it = GetAtIteratorFila2(filaAptos);
-			printf("%d -> ", tcb_it->tid);
+			printf("(id:%d, p:%u) -> ", tcb_it->tid, tcb_it->prio);
 		} while (NextFila2(filaAptos)==0);
 	}	
 	printf("NULL\n");

@@ -11,8 +11,10 @@
 #define MAXIMO_THREAD 100
 
 int threadID = 0;
-int debugPrints = 1;
+int debugPrints = 0;
 int maintcb = 0;
+unsigned int lastTime = 0;
+
 
 /*--------------------------------------------------------------------
 Função: CCREATE
@@ -28,8 +30,10 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	if(0)
 		printf("Entrando em ccreate... \n");
 
-	if(!esca_getIniciado())
+	if(!esca_getIniciado()){
+		startTimer();
 		esca_escalonadorInit();
+	}
 
 	if(!maintcb){
 		if(0)
@@ -69,16 +73,21 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 
 int cyield(void)
 {
-	//if(!getIniciado())
-	//	escalonadorInit();
+	if(!esca_getIniciado()){
+		startTimer();
+		esca_escalonadorInit();
+	}
 
 	if(debugPrints)
     	printf ("ENTROU EM CCYIELD \n ");
 
 	//provavelmente neste ponto teremos que acrescentar o tepmo de execução atual da thread no campo prioridade  <<<<<<<<<<<<<
 
+    TCB_t* t = esca_getThreadEmExec();
+    t->prio += stopTimer();
+    startTimer();
 
-	if(maintcb != 0 && filas_insereAptos(esca_getThreadEmExec()) != 0)
+	if(maintcb != 0 && filas_insereAptos(t) != 0)
 		printf("Falha ao inserir\n");
 
 	if(esca_dispatcher() == -1){
@@ -123,13 +132,7 @@ int cjoin (int tid){
 
 int csem_init (csem_t *sem, int count)
 {
-	//*sem = (csem_t*)malloc(sizeof(csem_t));
-	/*
-	if(*sem == NULL){
-		printf("sem == NULL\n");
-		return -1;
-	}
-	*/
+
 	sem->count = count;
 	//int x = CreateFila2(sem->fila);
 	sem->fila = (PFILA2)malloc(sizeof(FILA2));
@@ -150,7 +153,6 @@ int cwait(csem_t *sem)
 	}
 	else /// não há recurso disponível
 	{
-
 		TCB_t* t = esca_getThreadEmExec();
 		if(AppendFila2(sem->fila, (void*)t) != 0)
 			return -1;
