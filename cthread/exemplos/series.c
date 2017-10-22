@@ -29,7 +29,7 @@ void* fibonnaci (void *i) {
 
      fi = 0;
      fj = 1 ;
-     printf ("0 1");
+     printf ("Fibo: 0 1");
      for (k = 1; k <= n; k++) {
          fk = fi + fj;
          fi = fj;

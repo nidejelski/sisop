@@ -53,9 +53,10 @@ void* esca_execThread(void *(*func)(void*),void *arg)
         filas_BloqsToAptos(tidEsperando);
     }
 
-    filas_deletaTcb(threadEmExec->tid);
+    //filas_deletaTcb(threadEmExec->tid);
 
-    ///// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< fazeruma função que libere a memória da tcb
+    tcb_freeTCB(threadEmExec);
+
     esca_dispatcher();
 
     //printf("n eh p vir aqui!!!!!!!!!!!!\n");

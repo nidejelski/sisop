@@ -6,6 +6,7 @@
 #include "cthread.h"
 #include "escalonador.h"
 #include "tcb.h"
+#include "filas.h"
 
 #define TAMANHO_PILHA 16384
 #define MAXIMO_THREAD 100
@@ -26,8 +27,6 @@ Quando executada corretamente: retorna um valor positivo, que representa o ident
 Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
 int ccreate(void* (*start)(void*), void *arg, int prio){
-	if(0)
-		printf("Entrando em ccreate... \n");
 
 	if(!esca_getIniciado()){
 		esca_escalonadorInit();
@@ -49,12 +48,10 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	tcb_createContext(t ,&esca_execThread, start, arg, TAMANHO_PILHA);
 	filas_insereTcb(t->tid);
 
-    int tamFilas = filas_tam();
-
     //Garante o maximo de threads
-    if (tamFilas < MAXIMO_THREAD){
+    if (filas_tam() < MAXIMO_THREAD){
         if (filas_insereAptos(t) != 0) 
-        	printf("Erro ao inserir\n");
+        	return -1;;
         return t->tid;
     }
     else {
@@ -93,31 +90,7 @@ int cjoin (int tid){
 		startTimer();
 		esca_escalonadorInit();
 	}
-	/*
-	TCB_t *thread = (TCB_t*)filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
-	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< comentei aqui só pra compilar
-	/// depois se der troca o nome dessa variável, pq pode confundir com a que tem em escalonador.c
 
-	if (thread == NULL){	//se a thread nao existe
-		printf("ERRO: Thread %d nao existe\n",tid);
-		return (-1);
-	}
-	//testa se essa thread é esperada por alguma outra thread
-	if (thread->espera == 0){	//é zero quando nenhuma outra fez cjoin para essa thr
-			getcontext(&(threadExec->context)); //verificar essa linha!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-			thread->aguardada_por = threadExec->tid;	//a que está em exec espera pela thr que está sendo setada no campo espera
-			threadExec->aguarda_termino = tid;	//era nossa exec que aguarda o fim da thr->tid
-			threadExec->state = PROCST_BLOQ;
-			//manda thr em exec para fila de bloq
-			//encerra função em exec
-			//chama escalonador
-		}
-	else{
-		printf("ERRO: impossivel realizar cjoin para a thread %d \n", tid );
-		return(-1);
-	}
-	*/
 	if(filas_isThreadWaitingFor(tid)==-1) /// já tem alguém esperando por essa tid?
 	{	
 		TCB_t* t = esca_getThreadEmExec();
@@ -126,6 +99,7 @@ int cjoin (int tid){
 
 		filas_setThreadWaiting(t->tid, tid);
 		esca_dispatcher();
+		return 0;
 	}
 	else
 		return -1;
@@ -174,3 +148,36 @@ int csignal(csem_t *sem)
 	return 0;
 }
 
+
+
+/*
+int cjoin (int tid){	
+	if(!esca_getIniciado()){
+		startTimer();
+		esca_escalonadorInit();
+	}
+	
+	TCB_t *thread = (TCB_t*)filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
+	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< comentei aqui só pra compilar
+	/// depois se der troca o nome dessa variável, pq pode confundir com a que tem em escalonador.c
+
+	if (thread == NULL){	//se a thread nao existe
+		printf("ERRO: Thread %d nao existe\n",tid);
+		return (-1);
+	}
+	//testa se essa thread é esperada por alguma outra thread
+	if (thread->espera == 0){	//é zero quando nenhuma outra fez cjoin para essa thr
+			getcontext(&(threadExec->context)); //verificar essa linha!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+			thread->aguardada_por = threadExec->tid;	//a que está em exec espera pela thr que está sendo setada no campo espera
+			threadExec->aguarda_termino = tid;	//era nossa exec que aguarda o fim da thr->tid
+			threadExec->state = PROCST_BLOQ;
+			//manda thr em exec para fila de bloq
+			//encerra função em exec
+			//chama escalonador
+		}
+	else{
+		printf("ERRO: impossivel realizar cjoin para a thread %d \n", tid );
+		return(-1);
+	}
+	*/

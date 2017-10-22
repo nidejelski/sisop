@@ -13,7 +13,7 @@ all: libcthread
 
 libcthread: escalonador.o cthread.o filas.o tcb.o
 	mv *.o $(BIN_DIR)
-	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o
+	ar rcs $(LIB_DIR)/libcthread.a $(BIN_DIR)/escalonador.o $(BIN_DIR)/cthread.o $(BIN_DIR)/filas.o $(BIN_DIR)/tcb.o $(BIN_DIR)/support.o
 
 escalonador.o:
 	$(CC) $(CFLAGS) -I$(INC_DIR) $(SRC_DIR)/escalonador.c

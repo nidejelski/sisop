@@ -133,9 +133,7 @@ int	main(int argc, char *argv[]) {
 	   }
 
 	for(i = 0; i < N; i++) {
-	   if (ThreadId[i] = ccreate(Philosophers, (void *)i),0) {
-	      exit(0);
-	   }
+	   ThreadId[i] = ccreate(Philosophers, (void *)i,0); 
 	}
 
         printf("#\n# The dinner will begin...\n");

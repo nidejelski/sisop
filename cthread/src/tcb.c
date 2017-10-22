@@ -25,3 +25,11 @@ void tcb_createContext(TCB_t* t,void* exec, void* func, void* arg, int tamPilha)
 
     makecontext(&t->context,exec,2,func,arg);
 }
+
+
+void tcb_freeTCB(TCB_t* t)
+{
+    if(t->context.uc_stack.ss_sp != NULL)
+        free(t->context.uc_stack.ss_sp);
+    free(t);
+}
