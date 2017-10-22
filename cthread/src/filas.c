@@ -15,8 +15,8 @@ PFILA2 filaBloqs;
 
 int filas_Init()
 {
-	filaAptos = (PFILA2)malloc(sizeof(PFILA2));
-	filaBloqs = (PFILA2)malloc(sizeof(PFILA2));
+	filaAptos = (PFILA2)malloc(sizeof(FILA2));
+	filaBloqs = (PFILA2)malloc(sizeof(FILA2));
 	if(filaAptos == NULL || filaBloqs == NULL)
 		return -1;
 	else

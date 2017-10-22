@@ -20,32 +20,6 @@ void esca_escalonadorInit(){
 }
 
 
-/*   << função de outro trabalho do dispatcher
-// realiza o despache de threads
-int sched_dispatch(int reschedulecurrent){
-    FIFO_t *currentfifo = sched_choose_FIFO();
-
-    if (currentfifo == NULL)
-        return -1;
-
-    TCB_t *prevtcb = currenttcb;
-    TCB_t *nexttcb = sched_get_next_thread(currentfifo);
-
-    if (nexttcb == NULL)
-        return -1;
-
-    if (reschedulecurrent)
-        sched_add_thread(currenttcb);
-
-    currenttcb = nexttcb;
-
-    tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
-    int result = tcb_swapcontext(prevtcb,currenttcb);
-
-    return result;
-}
-*/
-
 
 /// será que seria necessário colocar essa função noutro arquivo? 
 int esca_dispatcher(){
@@ -126,3 +100,29 @@ void liberaEscalonador(int id){
 */
 
 
+
+/*   << função de outro trabalho do dispatcher
+// realiza o despache de threads
+int sched_dispatch(int reschedulecurrent){
+    FIFO_t *currentfifo = sched_choose_FIFO();
+
+    if (currentfifo == NULL)
+        return -1;
+
+    TCB_t *prevtcb = currenttcb;
+    TCB_t *nexttcb = sched_get_next_thread(currentfifo);
+
+    if (nexttcb == NULL)
+        return -1;
+
+    if (reschedulecurrent)
+        sched_add_thread(currenttcb);
+
+    currenttcb = nexttcb;
+
+    tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
+    int result = tcb_swapcontext(prevtcb,currenttcb);
+
+    return result;
+}
+*/

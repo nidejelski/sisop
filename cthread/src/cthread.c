@@ -14,23 +14,6 @@ int threadID = 0;
 int debugPrints = 1;
 int maintcb = 0;
 
-/*
-int pegaTamFila(PFILA2 fila){
-    int i=1;
-
-    if (FirstFila2(fila) == 0){
-        while(NextFila2(fila) == 0) {
-            i++;
-        }
-    }
-    else return 0;
-
-    FirstFila2(fila);
-    return i;
-}
-*/
-
-
 /*--------------------------------------------------------------------
 Função: CCREATE
 Parâmetros:
@@ -42,14 +25,14 @@ Quando executada corretamente: retorna um valor positivo, que representa o ident
 Caso contrário, retorna um valor negativo.
 --------------------------------------------------------------------*/
 int ccreate(void* (*start)(void*), void *arg, int prio){
-	if(debugPrints)
+	if(0)
 		printf("Entrando em ccreate... \n");
 
 	if(!esca_getIniciado())
 		esca_escalonadorInit();
 
 	if(!maintcb){
-		if(debugPrints)
+		if(0)
 			printf("Criando thread de main\n");
 		maintcb = 1;
 		TCB_t* main = tcb_createTCB(0);
@@ -62,7 +45,7 @@ int ccreate(void* (*start)(void*), void *arg, int prio){
 	TCB_t* t = tcb_createTCB(++threadID);
 	tcb_createContext(t ,&esca_execThread, start, arg, TAMANHO_PILHA);
 
-	if(debugPrints)
+	if(0)
     	printf ("TID criado: %d \n", t->tid);
 
     int tamFilas = filas_tam();
@@ -98,8 +81,11 @@ int cyield(void)
 	if(maintcb != 0 && filas_insereAptos(esca_getThreadEmExec()) != 0)
 		printf("Falha ao inserir\n");
 
-	if(esca_dispatcher() == -1)
+	if(esca_dispatcher() == -1){
+		if(debugPrints)
+			printf("Nao tinha outra thread em aptos, segue o baile\n");
 		return -1;
+	}
 
 	return 0;
 }
@@ -108,7 +94,7 @@ int cyield(void)
 int cjoin (int tid){	
 	esca_escalonadorInit();
 
-	TCB_t *thread = filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
+	TCB_t *thread = (TCB_t*)filas_existeThread(tid); //thread solicitada para cjoin  <<<<<<<<<<<<<<<<<<<<<<<<<<<< tá tendo um warning aqui, ver depois
 	TCB_t *threadExec = NULL;//threadEmExecucao(); //thread que chamou cjoin MUDAR NOME DA FUNÇÃO <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< comentei aqui só pra compilar
 	/// depois se der troca o nome dessa variável, pq pode confundir com a que tem em escalonador.c
 
@@ -135,20 +121,52 @@ int cjoin (int tid){
 }
 
 
-/*
-int sched_dispatch(int reschedulecurrent){
-	FIFO_t *currentfifo = sched_choose_FIFO();
-	if (currentfifo == NULL)
+int csem_init (csem_t *sem, int count)
+{
+	//*sem = (csem_t*)malloc(sizeof(csem_t));
+	/*
+	if(*sem == NULL){
+		printf("sem == NULL\n");
 		return -1;
-	TCB_t *prevtcb = currenttcb;
-	TCB_t *nexttcb = sched_get_next_thread(currentfifo);1
-	if (nexttcb == NULL)
+	}
+	*/
+	sem->count = count;
+	//int x = CreateFila2(sem->fila);
+	sem->fila = (PFILA2)malloc(sizeof(FILA2));
+	if(sem->fila == NULL){
+		printf("fila == NULL\n");
 		return -1;
-	if (reschedulecurrent)
-		sched_add_thread(currenttcb);
-	currenttcb = nexttcb;
-	tcb_setstate(currenttcb,MTHREAD_STATE_RUNNING);
-	int result = tcb_swapcontext(prevtcb,currenttcb);
-	return result;
+	}
+	return 0;
 }
-*/
+
+
+int cwait(csem_t *sem)
+{
+	if(sem->count > 0) /// há recurso disponível
+	{
+		sem->count--;
+		return 0;
+	}
+	else /// não há recurso disponível
+	{
+
+		TCB_t* t = esca_getThreadEmExec();
+		if(AppendFila2(sem->fila, (void*)t) != 0)
+			return -1;
+		esca_dispatcher();
+		return 0;
+	}
+}
+
+int csignal(csem_t *sem)
+{
+	sem->count++;
+	if(FirstFila2(sem->fila) != 0)
+		return -1;
+	TCB_t* t= (TCB_t*)GetAtIteratorFila2(sem->fila);
+	DeleteAtIteratorFila2(sem->fila);
+	filas_insereAptos(t);
+	return 0;
+
+}
